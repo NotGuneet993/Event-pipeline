@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="EtwExtractor.Benchmark/EtwExtractor.Benchmark.csproj" />
+  <Project Path="EtwExtractor.Test/EtwExtractor.Test.csproj" />
+  <Project Path="EtwExtractor/EtwExtractor.csproj" />
+</Solution>
