@@ -1,30 +1,28 @@
-﻿using System;
-using Microsoft.Diagnostics.Tracing;
-using Microsoft.Diagnostics.Tracing.Session;
-using Microsoft.Diagnostics.Tracing.Parsers;
-
-using EtwExtractor.Options;
+﻿using EtwExtractor.Options;
 using EtwExtractor.Filter;
+using EtwExtractor.EventListener;
 
 var etwTracerOptions = new EtwOptionbuilder()
     .EnableKernelNetworkTCPIP()
     .EnableKernelContextSwitch()
+    .AddApplication("chrome")
     .AddApplication("Discord")
     .Build();
 
 var etwFilter = new EtwFilter(etwTracerOptions);
 
-using (var session = new TraceEventSession("KernelProcessSession"))
+// create the mapper 
+
+// create the writer
+
+
+using (var kernelTracer = new KernelEventListener(etwTracerOptions, etwFilter))
 {
+    Console.WriteLine("Started...");
+    kernelTracer.Start();
+    await Task.Delay(5000);
 
-    session.EnableKernelProvider(etwTracerOptions.GetKernelOptions());
-    session.Source.Kernel.All += (data) =>
-    {
-        if (etwFilter.ShouldKeep(data))
-        {
-            Console.WriteLine($"{data.EventName}\t{data.FormattedMessage}\t{data.KernelTime}\t{data.Level}\t{data.ProcessID}\t{data.ProcessName}\t{data.ProviderGuid}\t{data.ProviderName}\t");
-        }
-    };
-
-    session.Source.Process();
+    Console.WriteLine("Stopping...");
+    kernelTracer.Stop();
+    Console.WriteLine("Stopped.");
 }
