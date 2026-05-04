@@ -9,7 +9,7 @@ namespace EtwExtractor.Writer
 {
     public interface IWriter<T>
     {
-        bool Write(T obj);
+        public bool Write(ref T obj);
     }
 }
 

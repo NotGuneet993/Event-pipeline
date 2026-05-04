@@ -1,6 +1,7 @@
 ﻿using EtwExtractor.Options;
 using EtwExtractor.Filter;
 using EtwExtractor.EventListener;
+using EtwExtractor.Mapper;
 
 var etwTracerOptions = new EtwOptionbuilder()
     .EnableKernelNetworkTCPIP()
@@ -8,15 +9,13 @@ var etwTracerOptions = new EtwOptionbuilder()
     .AddApplication("chrome")
     .AddApplication("Discord")
     .Build();
-
 var etwFilter = new EtwFilter(etwTracerOptions);
-
-// create the mapper 
+var mapper = new EventToStructMapper();
 
 // create the writer
 
 
-using (var kernelTracer = new KernelEventListener(etwTracerOptions, etwFilter))
+using (var kernelTracer = new KernelEventListener(etwTracerOptions, etwFilter, mapper))
 {
     Console.WriteLine("Started...");
     kernelTracer.Start();
