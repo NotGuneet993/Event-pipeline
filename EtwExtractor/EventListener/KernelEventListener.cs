@@ -16,16 +16,19 @@ namespace EtwExtractor.EventListener
         private EtwOptions options;
         private IFilter<TraceEvent> etwFilter;
         private IMapper<TraceEvent, RawEventStruct> converter;
-        //private IWriter abc
+        private IWriter<RawEventStruct> writer;
 
-        public KernelEventListener(EtwOptions options, IFilter<TraceEvent> etwFilter, IMapper<TraceEvent, RawEventStruct> converter) 
+        public KernelEventListener(EtwOptions options, IFilter<TraceEvent> etwFilter, IMapper<TraceEvent, RawEventStruct> converter, IWriter<RawEventStruct> writer) 
         {
             if (options == null) throw new ArgumentNullException("options");
             if (etwFilter == null) throw new ArgumentNullException("filter");
+            if (converter == null) throw new ArgumentNullException("converter");
+            if (writer == null) throw new ArgumentNullException("writer");
 
             this.options = options;
             this.etwFilter = etwFilter;
             this.converter = converter;
+            this.writer = writer;
 
             runningState = false;
             session = new TraceEventSession("KernelTracingSession");
@@ -74,9 +77,7 @@ namespace EtwExtractor.EventListener
             }
 
             var structuredEvt = converter.Convert(evt);
-            // write the item 
-
-            Console.WriteLine($"{evt.EventName}\t{evt.TimeStamp}\t{evt.ProcessName}\t{evt.ProcessID}");
+            writer.Write(ref structuredEvt);
         }
     }
 }
