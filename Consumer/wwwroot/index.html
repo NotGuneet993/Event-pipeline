@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ETW Live Feed</title>
+    <style>
+        body {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: monospace;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #569cd6;
+        }
+
+        #feed {
+            display: flex;
+            flex-direction: column-reverse;
+            height: 80vh;
+            overflow-y: auto;
+        }
+
+        .event {
+            padding: 4px 8px;
+            border-bottom: 1px solid #333;
+            font-size: 13px;
+        }
+
+            .event:hover {
+                background: #2d2d2d;
+            }
+
+        span.label {
+            color: #9cdcfe;
+        }
+
+        span.value {
+            color: #ce9178;
+        }
+    </style>
+</head>
+<body>
+    <h1>ETW Live Feed</h1>
+    <div id="feed"></div>
+
+    <script>
+        const feed = document.getElementById('feed');
+        const ws = new WebSocket(`ws://${location.host}/ws`);
+
+        ws.onopen = () => console.log('Connected');
+        ws.onclose = () => console.log('Disconnected');
+
+        ws.onmessage = (msg) => {
+            const evt = JSON.parse(msg.data);
+            const div = document.createElement('div');
+            div.className = 'event';
+            div.innerHTML = `
+                <span class="label">time:</span> <span class="value">${evt.time}</span> |
+                <span class="label">event:</span> <span class="value">${evt.eventName}</span> |
+                <span class="label">process:</span> <span class="value">${evt.processName}</span> |
+                <span class="label">provider:</span> <span class="value">${evt.providerName}</span> |
+                <span class="label">machine:</span> <span class="value">${evt.machineName}</span>
+            `;
+            feed.prepend(div);
+        };
+    </script>
+</body>
+</html>

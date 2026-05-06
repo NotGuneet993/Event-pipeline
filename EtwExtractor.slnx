@@ -1,5 +1,4 @@
 <Solution>
-  <Project Path="EtwExtractor.Benchmark/EtwExtractor.Benchmark.csproj" />
-  <Project Path="EtwExtractor.Test/EtwExtractor.Test.csproj" />
+  <Project Path="Consumer/Consumer.csproj" Id="0910fc44-028b-4044-8b86-42b2e3a3ae45" />
   <Project Path="EtwExtractor/EtwExtractor.csproj" />
 </Solution>
