@@ -7,7 +7,7 @@ using Microsoft.Diagnostics.Tracing.Session;
 
 namespace EtwExtractor.EventListener
 {
-    public class KernelEventListener : IEventListener, IDisposable
+    public class KernelEventListener : IEventListener
     {
         private TraceEventSession session;
         private bool runningState;

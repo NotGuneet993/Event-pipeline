@@ -51,8 +51,9 @@ namespace EtwExtractor.WriteAheadLog
                     ON etw_events(timestamp);
 
                 CREATE TABLE IF NOT EXISTS etw_kafka_offset (
+                    id          INTEGER PRIMARY KEY,
                     offset      INTEGER NOT NULL,
-                    updated_at  INTEGER NOT NULL
+                    updated_at  TEXT NOT NULL
                 );";
 
             createTable.ExecuteNonQuery();

@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace EtwExtractor.Sender
 {
-    public interface ISender<T>
+    public interface ISender<T> : IDisposable
     {
-        bool Send(T input);
+        void Send(T input);
+
+        Task SendAsync(T input);
+
+        Task RunAsync(CancellationToken ct );
     }
 }

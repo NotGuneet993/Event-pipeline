@@ -7,7 +7,7 @@ using static System.Net.WebRequestMethods;
 
 namespace EtwExtractor.Writer
 {
-    public interface IWriter<T>
+    public interface IWriter<T> : IDisposable
     {
         public bool Write(ref T obj);
     }

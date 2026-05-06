@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EtwExtractor.Reader
 {
-    public interface IReader <T>
+    public interface IReader <T> : IDisposable
     {
         IAsyncEnumerable<IReadOnlyList<T>> ReadAsync(CancellationToken ct = default);
     }

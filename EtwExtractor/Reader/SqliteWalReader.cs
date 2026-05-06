@@ -1,11 +1,12 @@
 ﻿using EtwExtractor.WriteAheadLog;
 using Microsoft.Data.Sqlite;
 using Microsoft.Diagnostics.Utilities;
+using System.Data.Common;
 using System.Runtime.CompilerServices;
 
 namespace EtwExtractor.Reader
 {
-    public class SqliteWalReader : IReader<EtwRecordEntity>, IDisposable
+    public class SqliteWalReader : IReader<EtwRecordEntity>
     {
         private SqliteConnection connection;
         private long offset;
@@ -22,9 +23,11 @@ namespace EtwExtractor.Reader
         public async IAsyncEnumerable<IReadOnlyList<EtwRecordEntity>> ReadAsync([EnumeratorCancellation]CancellationToken ct = default)
         {
             using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(250));
+            var rounds = 0;
 
             while (!ct.IsCancellationRequested)
             {
+                rounds = 0;
                 await timer.WaitForNextTickAsync(ct);
                 var batch = FetchBatch();
 
@@ -34,20 +37,24 @@ namespace EtwExtractor.Reader
                 offset = batch[^1].Id;
 
                 // keep flushing
-                while (batch.Count == 250)
+                while (batch.Count == 250 && rounds < 10)
                 {
                     batch = FetchBatch();
                     if (batch.Count == 0) break;
                     yield return batch;
                     offset = batch[^1].Id;
+                    rounds++;
                 }
+
+                // update db with last offset here
+                UpdateOffset();
             }
         }
 
         private long GetOffset()
         {
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT offset FROM etw_kafka_offset LIMIT 1;";
+            cmd.CommandText = "SELECT offset FROM etw_kafka_offset WHERE id = 1;";
             var result = cmd.ExecuteScalar();
 
             if (result == null || result == DBNull.Value)
@@ -108,6 +115,17 @@ namespace EtwExtractor.Reader
             }
 
             return readList.AsReadOnly();
+        }
+
+        private void UpdateOffset()
+        {
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = @"
+        INSERT OR REPLACE INTO etw_kafka_offset (id, offset, updated_at)
+        VALUES (1, @offset, @updatedAt);";
+            cmd.Parameters.AddWithValue("@offset", offset);
+            cmd.Parameters.AddWithValue("@updatedAt", DateTime.UtcNow.ToString("O"));
+            cmd.ExecuteNonQuery();
         }
 
         public void Dispose()

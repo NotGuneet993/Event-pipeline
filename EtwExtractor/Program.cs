@@ -3,6 +3,8 @@ using EtwExtractor.Filter;
 using EtwExtractor.EventListener;
 using EtwExtractor.Mapper;
 using EtwExtractor.Writer;
+using EtwExtractor.Reader;
+using EtwExtractor.Sender;
 
 var etwTracerOptions = new EtwOptionbuilder()
     .EnableKernelNetworkTCPIP()
@@ -14,17 +16,18 @@ var etwTracerOptions = new EtwOptionbuilder()
 var etwFilter = new EtwFilter(etwTracerOptions);
 var mapper = new EventToStructMapper();
 var writer = new SqliteWalWriter();
-var kernelTracer = new KernelEventListener(etwTracerOptions, etwFilter, mapper, writer)
+var kernelTracer = new KernelEventListener(etwTracerOptions, etwFilter, mapper, writer);
 
+var sqlReader = new SqliteWalReader();
+var sender = new KafkaSender(sqlReader);
+var senderThread = new Thread(() => sender.RunAsync().GetAwaiter().GetResult())
+{
+    IsBackground = true,
+    Name = "ETW-Sender-Thread"
+};
 
 Console.WriteLine("Started...");
+senderThread.Start();
 kernelTracer.Start();
-await Task.Delay(5000);
 
-Console.WriteLine("Stopping...");
-kernelTracer.Stop();
-Console.WriteLine("Stopped.");
-
-// dispose
-writer.Dispose();
-kernelTracer.Dispose();
+await Task.Delay(Timeout.Infinite);

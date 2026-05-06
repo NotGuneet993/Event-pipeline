@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(ls -Recurse \"C:\\\\Users\\\\guber\\\\OneDrive\\\\Desktop\\\\CS\\\\C#\\\\EtwExtractor\\\\EtwExtractor\" | where { $_.PSIsContainer -eq $false })"
+    ]
+  }
+}

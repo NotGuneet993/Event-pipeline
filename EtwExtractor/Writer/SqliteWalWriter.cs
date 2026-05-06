@@ -5,8 +5,9 @@ using System.Data;
 
 namespace EtwExtractor.Writer
 {
-    public class SqliteWalWriter : IWriter<RawEventStruct>, IDisposable
+    public class SqliteWalWriter : IWriter<RawEventStruct>
     {
+        private SqliteConnection connection;
         private SqliteCommand command;
         private bool disposed;
 
@@ -14,28 +15,26 @@ namespace EtwExtractor.Writer
         {
             disposed = false;
             var wal = SqliteWal.Instance;
-            using (var connection = wal.GetConnection())
-            { 
-                command = (SqliteCommand)connection.CreateCommand();
-                command.CommandText = @"
-                    INSERT INTO etw_events 
-                        (timestamp, event_name, provider_name, provider_guid, 
+            connection = (SqliteConnection)wal.GetConnection();
+            command = (SqliteCommand)connection.CreateCommand();
+            command.CommandText = @"
+                    INSERT INTO etw_events
+                        (timestamp, event_name, provider_name, provider_guid,
                          process_id, process_name, level, machine_name)
-                    VALUES 
+                    VALUES
                         (@timestamp, @eventName, @providerName, @providerGuid,
                          @processId, @processName, @level, @machineName);";
 
-                command.Parameters.Add("@timestamp", SqliteType.Text);
-                command.Parameters.Add("@eventName", SqliteType.Text);
-                command.Parameters.Add("@providerName", SqliteType.Text);
-                command.Parameters.Add("@providerGuid", SqliteType.Text);
-                command.Parameters.Add("@processId", SqliteType.Integer);
-                command.Parameters.Add("@processName", SqliteType.Text);
-                command.Parameters.Add("@level", SqliteType.Integer);
-                command.Parameters.Add("@machineName", SqliteType.Text);
+            command.Parameters.Add("@timestamp", SqliteType.Text);
+            command.Parameters.Add("@eventName", SqliteType.Text);
+            command.Parameters.Add("@providerName", SqliteType.Text);
+            command.Parameters.Add("@providerGuid", SqliteType.Text);
+            command.Parameters.Add("@processId", SqliteType.Integer);
+            command.Parameters.Add("@processName", SqliteType.Text);
+            command.Parameters.Add("@level", SqliteType.Integer);
+            command.Parameters.Add("@machineName", SqliteType.Text);
 
-                command.Prepare();
-            }
+            command.Prepare();
         }
 
         public bool Write(ref RawEventStruct obj)
@@ -69,6 +68,7 @@ namespace EtwExtractor.Writer
             }
 
             command.Dispose();
+            connection.Dispose();
             disposed = true;
             GC.SuppressFinalize(this);
         }
