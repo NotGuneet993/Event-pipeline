@@ -27,10 +27,17 @@ namespace Consumer.Services
         public async Task<IReadOnlyList<EtwRecordEntity>> SearchAsync(string query)
         {
             var response = await _client.SearchAsync<EtwRecordEntity>(s => s
+                .Size(100)
                 .Query(q => q
                     .MultiMatch(m =>m 
                         .Query(query)
                         .Fields(new[] { "eventName", "processName", "providerName", "machineName"})
+                    )
+                )
+                .Sort(so => so
+                    .Field(f => f
+                        .Field("time")
+                        .Order(SortOrder.Desc)
                     )
                 )
             );

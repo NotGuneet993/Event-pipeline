@@ -76,6 +76,8 @@ namespace EtwExtractor.EventListener
                 return;
             }
 
+            Console.WriteLine($"Kept: {evt.ProcessName}\t{evt.EventName}");
+
             var structuredEvt = converter.Convert(evt);
             writer.Write(ref structuredEvt);
         }

@@ -29,7 +29,7 @@ namespace EtwExtractor.Options
             options.AddKernelOption(KernelTraceEventParser.Keywords.MemoryHardFaults);
             return this;
         }
-
+            
         public EtwOptionbuilder EnableKernelNetworkTCPIP()
         {
             options.AddKernelOption(KernelTraceEventParser.Keywords.NetworkTCPIP);
