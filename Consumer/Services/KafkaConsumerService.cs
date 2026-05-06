@@ -64,6 +64,8 @@ namespace Consumer.Services
                             _wsManager.BroadcastAsync(evt, stoppingToken),
                             _esService.IndexAsync(evt, stoppingToken)
                         );
+
+                        _consumer.Commit(result);
                     }
                     catch (ConsumeException ex)
                     {

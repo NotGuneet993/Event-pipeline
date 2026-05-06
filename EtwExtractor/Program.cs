@@ -8,7 +8,6 @@ using EtwExtractor.Sender;
 
 var etwTracerOptions = new EtwOptionbuilder()
     .EnableKernelNetworkTCPIP()
-    .EnableKernelContextSwitch()
     .AddApplication("chrome")
     .AddApplication("Discord")
     .Build();

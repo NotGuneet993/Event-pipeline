@@ -29,15 +29,27 @@ namespace Consumer.Controllers
 
             _wsService.Add(id, socket);
 
-            Console.WriteLine("Connected!");
-
-            var buffer = new byte[1024];
-            while (socket.State == WebSocketState.Open)
+            try
             {
-                await socket.ReceiveAsync(buffer, CancellationToken.None);
+                var buffer = new byte[1024];
+                while (socket.State == WebSocketState.Open)
+                {
+                    await socket.ReceiveAsync(buffer, CancellationToken.None);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                _wsService.Remove(id);
+                
+                if (socket.State == WebSocketState.Open)
+                {
+                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Server is shutting down", CancellationToken.None);
+                }
             }
 
-            _wsService.Remove(id);
         }
     }
 }

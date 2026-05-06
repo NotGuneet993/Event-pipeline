@@ -20,7 +20,7 @@ namespace Consumer.Services
 
             if (!respose.IsSuccess())
             {
-                _logger.LogError("Fialed to index event {EventName}", evt.EventName);
+                _logger.LogError("Failed to index event {EventName}", evt.EventName);
             }
         }
 

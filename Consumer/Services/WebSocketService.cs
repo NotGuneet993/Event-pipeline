@@ -29,7 +29,10 @@ namespace EtwDashboard.Services
 
         public async Task BroadcastAsync(EtwRecordEntity evt, CancellationToken ct = default)
         {
-            var json = JsonSerializer.Serialize(evt);
+            var json = JsonSerializer.Serialize(evt, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
             var bytes = Encoding.UTF8.GetBytes(json);
             var segment = new ArraySegment<byte>(bytes);
 

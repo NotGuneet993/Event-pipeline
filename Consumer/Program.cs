@@ -5,6 +5,10 @@ using EtwDashboard.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.ShutdownTimeout = TimeSpan.FromSeconds(3);
+});
 
 // Elasticsearch
 builder.Services.AddSingleton<ElasticsearchClient>(sp =>
@@ -18,6 +22,12 @@ builder.Services.AddSingleton<ElasticsearchClient>(sp =>
 // Add services for DI
 builder.Services.AddSingleton<ElasticsearchService>();
 builder.Services.AddSingleton<WebSocketService>();
+
+// 5 kafka consumers
+builder.Services.AddHostedService<KafkaConsumerService>();
+builder.Services.AddHostedService<KafkaConsumerService>();
+builder.Services.AddHostedService<KafkaConsumerService>();
+builder.Services.AddHostedService<KafkaConsumerService>();
 builder.Services.AddHostedService<KafkaConsumerService>();
 
 var app = builder.Build();
